@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Architecture</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        button {
+            padding: 12px 24px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        pre {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+        }
+        .tree { color: #60a5fa; line-height: 1.8; }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug Architecture Section</h1>
+    
+    <button onclick="testAPI()">Test API</button>
+    <button onclick="clearCache()">Clear Cache</button>
+    <button onclick="window.location.href='/'">Go to App</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/analyze/Prem-Reddy30/Snake-Game-Python');
+                const data = await response.json();
+                
+                let html = '<h2>✅ API Response:</h2>';
+                html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                html += '<h2>📁 File Tree Visualization:</h2>';
+                html += '<div class="tree">';
+                html += '<div>📦 Prem-Reddy30/Snake-Game-Python/</div>';
+                
+                if (data.fileTree && data.fileTree.length > 0) {
+                    data.fileTree.forEach(item => {
+                        if (item.type === 'dir') {
+                            html += `<div style="padding-left: 20px;">├── 📁 ${item.name}/</div>`;
+                            if (item.children) {
+                                item.children.forEach(child => {
+                                    const icon = child.type === 'dir' ? '📁' : '📄';
+                                    html += `<div style="padding-left: 40px;">├── ${icon} ${child.name}</div>`;
+                                });
+                            }
+                        } else {
+                            html += `<div style="padding-left: 20px;">├── 📄 ${item.name}</div>`;
+                        }
+                    });
+                } else {
+                    html += '<div style="padding-left: 20px; color: red;">❌ No fileTree data!</div>';
+                }
+                
+                html += '</div>';
+                
+                html += '<h2>📋 Instructions:</h2>';
+                html += '<ol>';
+                html += '<li>Click "Clear Cache" button above</li>';
+                html += '<li>Click "Go to App" button</li>';
+                html += '<li>Enter: <code>https://github.com/Prem-Reddy30/Snake-Game-Python</code></li>';
+                html += '<li>Click "Analyze your repo →"</li>';
+                html += '<li>Click "Architecture" tab</li>';
+                html += '<li>You should see all 6 files listed above!</li>';
+                html += '</ol>';
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<h2 style="color: red;">❌ Error: ${error.message}</h2>`;
+            }
+        }
+
+        function clearCache() {
+            localStorage.removeItem('codedashboard_repo_cache');
+            alert('✅ Cache cleared! Now click "Go to App" and test.');
+        }
+    </script>
+</body>
+</html>

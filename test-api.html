@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        pre { background: #2a2a2a; padding: 15px; border-radius: 8px; overflow: auto; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>DeveloperDashboard API Test</h1>
+    
+    <button onclick="testAPI()">Test API: facebook/react</button>
+    <button onclick="clearCache()">Clear Cache</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/analyze/facebook/react');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <h2 class="success">✅ API Working!</h2>
+                    <h3>Architecture Data:</h3>
+                    <pre>${JSON.stringify(data.architecture, null, 2)}</pre>
+                    <h3>Recent Commits:</h3>
+                    <pre>${JSON.stringify(data.recentCommits, null, 2)}</pre>
+                    <h3>Full Response:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<h2 class="error">❌ Error: ${error.message}</h2>`;
+            }
+        }
+
+        function clearCache() {
+            localStorage.removeItem('codedashboard_repo_cache');
+            alert('Cache cleared! Now refresh the main app and try analyzing a repo again.');
+        }
+    </script>
+</body>
+</html>
